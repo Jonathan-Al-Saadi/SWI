@@ -22,9 +22,11 @@ id=fopen(fname, 'r', 'b');			%use big endian format for VARIAN
     nbheaders = a(1);
     SizeTD2 = np;
     SizeTD1 = nblocks*ntraces;
-    tall = zeros(nblocks*ntraces*np, 1);
+    y = zeros(SizeTD1, SizeTD2/2);
+    a = zeros(nblocks*ntraces*np, 1);
   						%determine the actual binary format from the status bit
     BinaryStatus = fliplr(dec2bin(status));
+    outDir = '/Users/jonathan/Desktop/Test';
     if ((BinaryStatus(3) == '0') & (BinaryStatus(4) == '0'))
       for QTEMP40=1:nblocks
         for QTEMP41=1:nbheaders
@@ -69,14 +71,20 @@ id=fopen(fname, 'r', 'b');			%use big endian format for VARIAN
         if (length(b) ~= ntraces*np)
           b( (length(b)+1):ntraces*np ) = 0;
         end
-        
+        fname = fullfile(outDir, sprintf('data_%05d.mat', QTEMP40));
+        save(fname, 'b');
         %put the data in the vector
         a( ((QTEMP40-1)*np*ntraces+1) : QTEMP40*np*ntraces ) = b;
         %end
       end  
     end
     
-    [xa, ya] = size(a);
+    ds = fileDatastore(fullfile(outDir, '*.mat'), ...
+    'ReadFcn', @(fname) getfield(load(fname), 'b'), ...
+    'UniformRead', true);
+    
+    c = tall(ds);
+    
     y = zeros(SizeTD1, SizeTD2/2);
     for tel=1:(SizeTD1)
       %note that for VNMR we perform a transpose AND complex conjugate to obtain the right direction for the spectra
