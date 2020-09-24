@@ -130,7 +130,6 @@ switch flag
     status = a(2);
     [a, count] = fread(id, 1, 'int32');
     nbheaders = a(1);
-   
     SizeTD2 = np;
     SizeTD1 = nblocks*ntraces;
     a = zeros(nblocks*ntraces*np, 1);
@@ -177,11 +176,12 @@ switch flag
         %
         %check whether data has the correct length, otherwise append zeros
         %
-        if (length(b) ~= ntraces*np)
-          b( (length(b)+1):ntraces*np ) = 0;
-        end
-        							%put the data in the vector
+        %if (length(b) ~= ntraces*np)
+         % b( (length(b)+1):ntraces*np ) = 0;
+        %end
+        				
         a( ((QTEMP40-1)*np*ntraces+1) : QTEMP40*np*ntraces ) = b;
+        end
       end  
     end  
   
