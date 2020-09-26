@@ -1,4 +1,4 @@
-function vol = Swi();
+function [vol, minvol, meanvol, maxvol] = Swi();
 
 %% Reading the phase and magnitude, then determining dimensions
 mag = niftiread('/Users/jonathan/Desktop/s_20200609_Gris7hjarna/Pig7mge3d.nii/MG/image004.nii'); [magSizeX, magSizeY, magSizeZ] = size(mag);
@@ -24,7 +24,7 @@ filter = fftshift(filter);
 %that and inverse forierransfroming which creates a lowpass filter stored
 %in lpslice. To create a high pass filter, every comp slice is divided by the
 %corrosponding lpslice and the value is assigned to hpcomp.
-for o = 1:z
+for o = 1:magSizeZ
     lpslice = ifft2(fft2(comp(:,:,o)).*filter);
     hpcomp(:,:,o) = comp(:,:,o)./lpslice;
 end
@@ -35,9 +35,9 @@ hpphase = angle(hpcomp);
 phaseMask = zeros(magSizeX, magSizeY, magSizeZ);
 
 %% Rescaling all values between -pi and 0 to 0 to 1. Everything above 0 is set to 1.
-for int slice = 1:magSizeZ
-    for int yDim = 1:magSizeY
-        for int xDim = 1:magSizeX
+for slice = 1:magSizeZ
+    for yDim = 1:magSizeY
+        for xDim = 1:magSizeX
             if hpphase(xDim, yDim, slice) >= 0
                 phaseMask(xDim, yDim, slice) = 1;
             else
@@ -47,6 +47,26 @@ for int slice = 1:magSizeZ
     end
 end
 
-vol = phaseMask
-    
-    
+%% Creating the SWI
+%phaseMask ^4 then multiplying it by the magnitude image. 4 comes from
+%Hacke et al's original paper.
+vol = phaseMask.^4.*mag;
+
+%% Creating the MIP
+% Choosing thickness 8. It loops through the matrix, then 
+for slice = 1:magSizeZ/4
+    for yDim = 1:magSizeY
+        for xDim = 1:magSizeX
+            if (slice-1)*4+8 < 512
+            minvol(xDim, yDim, slice+1) = min(vol(xDim, yDim, (slice-1)*4+1:(slice-1)*4+8));
+            meanvol(xDim, yDim, slice+1) = mean(vol(xDim, yDim, (slice-1)*4+1:(slice-1)*4+8));
+            maxvol(xDim, yDim, slice+1) = mean(vol(xDim, yDim, (slice-1)*4+1:(slice-1)*4+8));
+            else
+            mvol(xDim, yDim, slice+1) = min(vol(xDim, yDim, (slice-1)*4+1:(slice-1)*4+4));
+            mvol(xDim, yDim, slice+1) = min(vol(xDim, yDim, (slice-1)*4+1:(slice-1)*4+4));
+            end
+        end
+    end
+end
+
+

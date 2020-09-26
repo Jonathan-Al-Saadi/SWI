@@ -1,4 +1,4 @@
-function vol = Swi();
+function [vol, minvol, meanvol, maxvol] = Swi();
 
 %% Reading the phase and magnitude, then determining dimensions
 mag = niftiread('/Users/jonathan/Desktop/s_20200609_Gris7hjarna/Pig7mge3d.nii/MG/image004.nii'); [magSizeX, magSizeY, magSizeZ] = size(mag);
@@ -52,6 +52,23 @@ end
 %Hacke et al's original paper.
 vol = phaseMask.^4.*mag;
 
+%% Creating the MIP
+% Choosing thickness 8. It loops through the matrix, then calculates the
+% min, mean and max.
+for slice = 1:magSizeZ/4
+    for yDim = 1:magSizeY
+        for xDim = 1:magSizeX
+            if (slice-1)*4+8 < 512
+            minvol(xDim, yDim, slice+1) = min(vol(xDim, yDim, (slice-1)*4+1:(slice-1)*4+8));
+            meanvol(xDim, yDim, slice+1) = mean(vol(xDim, yDim, (slice-1)*4+1:(slice-1)*4+8));
+            maxvol(xDim, yDim, slice+1) = max(vol(xDim, yDim, (slice-1)*4+1:(slice-1)*4+8));
+            else
+            minol(xDim, yDim, slice+1) = min(vol(xDim, yDim, (slice-1)*4+1:end));
+            meanvol(xDim, yDim, slice+1) = mean(vol(xDim, yDim, (slice-1)*4+1:end));
+            maxvol(xDim, yDim, slice+1) = max(vol(xDim, yDim, (slice-1)*4+1:end));
+            end
+        end
+    end
+end
 
-    
-    
+
