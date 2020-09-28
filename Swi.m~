@@ -6,7 +6,7 @@ mag = niftiread('/Users/jonathan/Desktop/s_20200609_Gris7hjarna/Pig7mge3d.nii/MG
 phase = niftiread('/Users/jonathan/Desktop/s_20200609_Gris7hjarna/Pig7mge3d.nii/PH/image004.nii'); [phaseSizeX, phaseSizeY, phaseSizeZ] = size(phase);
 
 %Rotating the magnitude and phase images
-mag = rot90_3D(mag, 1, 3); phase = rot90_3D(phase, 1, 3);
+mag = rot90_3D(mag, 1, 1); phase = rot90_3D(phase, 1, 1);
 
 %Calculating the comp according to the euler equation m*e^(i*phase)
 comp = mag.*exp(i*(phase + pi));
@@ -53,22 +53,34 @@ volSwi = zeros(magSizeX, magSizeY, magSizeZ); volMin = zeros(magSizeX, magSizeY,
 %Hacke et al's original paper.
 volSwi = phaseMask.^4.*mag;
 
+% Creating the MIP, mean and max
+% Choosing thickness 8. It loops through the matrix, then calculates the
+% min, mean and max.
+% for slice = 1:magSizeZ/4
+%     for yDim = 1:magSizeY
+%         for xDim = 1:magSizeX
+%             if (slice-1)*4+8 < 512
+%             volMin(xDim, yDim, slice) = min(volSwi(xDim, yDim, (slice-1)*4+1:(slice-1)*4+8));            
+%             volMean(xDim, yDim, slice) = mean(volSwi(xDim, yDim, (slice-1)*4+1:(slice-1)*4+8));            
+%             volMax(xDim, yDim, slice) = max(volSwi(xDim, yDim, (slice-1)*4+1:(slice-1)*4+8));
+%             else
+%             volMin(xDim, yDim, slice) = min(volSwi(xDim, yDim, (slice-1)*4+1:(slice-1)*4+4));
+%             volMean(xDim, yDim, slice) = mean(volSwi(xDim, yDim, (slice-1)*4+1:(slice-1)*4+4));
+%             volMax(xDim, yDim, slice) = max(volSwi(xDim, yDim, (slice-1)*4+1:(slice-1)*4+4));
+%             end
+%         end
+%     end
+% end
 
 for slice = 1:magSizeZ/4
     if (slice-1)*4+8 < 512
     volMin(:,:, slice) = min(volSwi(:,:, (slice-1)*4+1:(slice-1)*4+8), [], 3);
-    volMean(:,:, slice) = min(volSwi(:,:, (slice-1)*4+1:(slice-1)*4+8), [], 3);
-    volMax(:,:, slice) = min(volSwi(:,:, (slice-1)*4+1:(slice-1)*4+8), [], 3);
     else
-    volMin(:,:, slice) = min(volSwi(:,:, (slice-1)*4+1:(slice-1)*4+4), [], 3);
-    volMean(:,:, slice) = min(volSwi(:,:, (slice-1)*4+1:(slice-1)*4+4), [], 3);
-    volMax(:,:, slice) = min(volSwi(:,:, (slice-1)*4+1:(slice-1)*4+4), [], 3);
-    end
+    volMin(:,:, slice) = min(volSwi(:,:, (slice-1)*4+1:(slice-1)*4+4), [], 3);    
 end
 
 vol.swi = volSwi;
 vol.min = volMin;
-vol.max = volMax;
-vol.mean = volMean;
-vol.mag = mag;
+%vol.max = volMax;
+%vol.mean = volMean;
 
