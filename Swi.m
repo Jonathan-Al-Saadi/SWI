@@ -2,8 +2,8 @@ function vol = Swi();
 
 %% Importing and preparing the data
 %Reading the phase and magnitude, then determining dimensions
-mag = niftiread('/Users/jonathan/Desktop/s_20200609_Gris7hjarna/Pig7mge3d.nii/MG/image004.nii'); [magSizeX, magSizeY, magSizeZ] = size(mag);
-phase = niftiread('/Users/jonathan/Desktop/s_20200609_Gris7hjarna/Pig7mge3d.nii/PH/image004.nii'); [phaseSizeX, phaseSizeY, phaseSizeZ] = size(phase);
+mag = niftiread('/Volumes/home/peter/s_20200612_gris5hjarna/Pig5mge3d.nii/MG/image004.nii'); [magSizeX, magSizeY, magSizeZ] = size(mag);
+phase = niftiread('/Volumes/home/peter/s_20200612_gris5hjarna/Pig5mge3d.nii/PH/image004.nii'); [phaseSizeX, phaseSizeY, phaseSizeZ] = size(phase);
 
 %Rotating the magnitude and phase images
 mag = rot90_3D(mag, 1, 3); phase = rot90_3D(phase, 1, 3);
