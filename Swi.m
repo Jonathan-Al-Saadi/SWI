@@ -19,7 +19,7 @@ comp = mag.*exp(i*(phase + pi));
 
 %% Creating a hanning filter, according to Hecke et al.
 %Choosing size 70, however this can be changed.
-filterSize = 70;
+filterSize = 140;
 filter = hanning(filterSize)*hanning(filterSize)';
 
 % Setting the filter size to equal the array size
@@ -77,4 +77,7 @@ vol.min = volMin;
 vol.max = volMax;
 vol.mean = volMean;
 vol.mag = mag;
+vol.hpphase = hpphase;
+vol.phasemask = phaseMask;
+
 

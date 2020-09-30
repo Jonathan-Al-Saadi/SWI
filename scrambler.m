@@ -21,8 +21,15 @@ end
 % Setting a random encryption key.
 encryptionkey = randi(100);
 
+%Making sure the encryption key is not 95 (Will spin Ceasar around or 63
+%which will capitilze)
+if encryptionkey == 95 || encryptionkey == 63
+    encryptionkey = encryptionkey + 1;
+end
+
 %Creating the pathname using ceasar
 dirPath = ceasar(tmp, encryptionkey);
+%Removing / to make sure there will be no subfolders.
 dirPath(dirPath == '/') = ' ';
 
 % Making the directory and adding the encryption key in a file there.
