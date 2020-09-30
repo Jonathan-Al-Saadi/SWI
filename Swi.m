@@ -1,9 +1,15 @@
 function vol = Swi();
 
 %% Importing and preparing the data
+%Importing the data
+if nargin == 0
+    [fileMag, pathMag] = uigetfile('*.nii', 'Choose magnitude images');
+    [filePhase, pathPhase] = uigetfile('*.nii', 'Choose phase images');   
+end
+
 %Reading the phase and magnitude, then determining dimensions
-mag = niftiread('/Volumes/home/peter/s_20200612_gris5hjarna/Pig5mge3d.nii/MG/image004.nii'); [magSizeX, magSizeY, magSizeZ] = size(mag);
-phase = niftiread('/Volumes/home/peter/s_20200612_gris5hjarna/Pig5mge3d.nii/PH/image004.nii'); [phaseSizeX, phaseSizeY, phaseSizeZ] = size(phase);
+mag = niftiread(strcat(pathMag, '/', fileMag)); [magSizeX, magSizeY, magSizeZ] = size(mag);
+phase = niftiread(strcat(pathPhase, '/', filePhase)); [phaseSizeX, phaseSizeY, phaseSizeZ] = size(phase);
 
 %Rotating the magnitude and phase images
 mag = rot90_3D(mag, 1, 3); phase = rot90_3D(phase, 1, 3);
