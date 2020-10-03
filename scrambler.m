@@ -8,11 +8,17 @@ samplenumberLength = length(samplenumber);
 %pre allocating a row vector of 20
 tmp = zeros(20,1)';
 
-%Setting the first part of the row vector to our samplenumber
-tmp(1:samplenumberLength) = samplenumber;
+%Setting one part of the row vector to our samplenumber
+startPlace = randi(5);
+
+tmp(startPlace:(samplenumberLength+startPlace-1)) = samplenumber; %Putting it in a random place in the row vector
 
 %Filling the rest with random integers
-for ii = (samplenumberLength+1):length(tmp)
+for ii = 1:startPlace-1
+    tmp(ii) = randi(200) + 100;
+end
+
+for ii = samplenumberLength+startPlace:20
     tmp(ii) = randi(200) + 100;
 end
 
@@ -28,12 +34,13 @@ if encryptionkey == 95 || encryptionkey == 63
 end
 
 %Creating the pathname using ceasar
-dirPath = ceasar(tmp, encryptionkey);
+scrambleName = ceasar(tmp, encryptionkey);
+
 %Removing / to make sure there will be no subfolders.
-dirPath(dirPath == '/') = ' ';
+dirPath = sprintf('Animal%d', randi(1000000));
 
 % Making the directory and adding the encryption key in a file there.
 mkdir(dirPath); cd(dirPath);
 fid = fopen( 'key.txt', 'wt' );
-fprintf(fid, '%f\n', encryptionkey);
+fprintf(fid, 'Original name: %s\n Encryption Key: %f\n Where in the string your number is: %f - %f\n', scrambleName, encryptionkey, startPlace, startPlace+samplenumberLength-1);
 cd('..');

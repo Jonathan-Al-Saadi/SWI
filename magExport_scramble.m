@@ -5,14 +5,13 @@ function magExport_scramble(samplenumber, format)
 %If user inputs filename as Swi, we calculate the SWI. Otherwise the
 %function just reads the img.
 
+
 vol = Swi();
 
 %Mapping the image from 0 - 256 if .img or dicom otherwise just rotating it.
-%mapped_mag = mapImage(vol.mag, format);
-%mapped_swi = mapImage(vol.swi, format);
-mapped_mag = vol.mag;
-mapped_swi = vol.swi;
-mapped_hpphase = vol.hpphase;
+mapped_mag = mapImage(vol.mag, format);
+mapped_swi = mapImage(vol.swi, format);
+mapped_hpphase = mapImage(vol.hpphase, format);
 
 %Creating a folder with encrypted name, leaving a key in the folder.
 dirPath = scrambler(samplenumber);
@@ -29,15 +28,15 @@ switch format
             imwrite(mapped_hpphase(:,:,slice), strcat(sprintf('HPHASE%.3d', slice), '.tif'))
         end
     case '.nii'
-        niftiwrite(mapped_mag, strcat(dirPath, 'MAG.nii'));
-        niftiwrite(mapped_swi, strcat(dirPath, 'SWI.nii'));
-        niftiwrite(mapped_hpphase, strcat(dirPath, 'HPHASE.nii'));
+        niftiwrite(mapped_mag, 'MAG.nii');
+        niftiwrite(mapped_swi, 'SWI.nii');
+        niftiwrite(mapped_hpphase, 'HPHASE.nii');
     case '.dcm'
         [x, y, slice] = size(mapped_mag);
-        mapped_mag = uint16(mapped_mag); mapped_swi = uint16(mapped_mag);
-        dicomwrite(reshape(mapped_mag, [x,y,1,slice]), strcat(dirPath, 'MAG.dcm'));
-        dicomwrite(reshape(mapped_swi, [x,y,1,slice]), strcat(dirPath, 'SWI.dcm'));
-        dicomwrite(reshape(mapped_hpphase, [x,y,1,slice]), strcat(dirPath, 'HPHASE.dcm'));
+        mapped_mag = uint16(mapped_mag); mapped_swi = uint16(mapped_swi); mapped_hpphase = uint16(mapped_hpphase); %Converting to uint16, which is obligatory for dicom.
+        dicomwrite(reshape(mapped_mag, [x,y,1,slice]), 'MAG.dcm');
+        dicomwrite(reshape(mapped_swi, [x,y,1,slice]), 'SWI.dcm');
+        dicomwrite(reshape(mapped_hpphase, [x,y,1,slice]), 'HPHASE.dcm');
     otherwise
         warning('Unexpected format. No export created. Use ''.tif'', ''.dicom'' or ''.nii''')
 end

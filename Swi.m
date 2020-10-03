@@ -1,15 +1,17 @@
-function vol = Swi();
+function vol = Swi(magDir, phaseDir) 
 
 %% Importing and preparing the data
 %Importing the data
 if nargin == 0
-    [fileMag, pathMag] = uigetfile('*.nii', 'Choose magnitude images');
-    [filePhase, pathPhase] = uigetfile('*.nii', 'Choose phase images');   
+    if ~ispc; menu('Choose magnitude image','OK'); end %Making sure macUsers know what to select
+    [fileMag, pathMag] = uigetfile('*.nii', 'Choose magnitude image'); magDir = strcat(pathMag, '/', fileMag);
+    if ~ispc; menu('Choose phase images','OK'); end %Making sure macUsers know what to select
+    [filePhase, pathPhase] = uigetfile(strcat(pathMag, '/*.nii'), 'Choose phase image'); phaseDir = strcat(pathPhase, '/', filePhase);
 end
 
 %Reading the phase and magnitude, then determining dimensions
-mag = niftiread(strcat(pathMag, '/', fileMag)); [magSizeX, magSizeY, magSizeZ] = size(mag);
-phase = niftiread(strcat(pathPhase, '/', filePhase)); [phaseSizeX, phaseSizeY, phaseSizeZ] = size(phase);
+mag = niftiread(magDir); [magSizeX, magSizeY, magSizeZ] = size(mag);
+phase = niftiread(phaseDir); [phaseSizeX, phaseSizeY, phaseSizeZ] = size(phase);
 
 %Rotating the magnitude and phase images
 mag = rot90_3D(mag, 1, 3); phase = rot90_3D(phase, 1, 3);
@@ -19,7 +21,7 @@ comp = mag.*exp(i*(phase + pi));
 
 %% Creating a hanning filter, according to Hecke et al.
 %Choosing size 70, however this can be changed.
-filterSize = 140;
+filterSize = 70;
 filter = hanning(filterSize)*hanning(filterSize)';
 
 % Setting the filter size to equal the array size
